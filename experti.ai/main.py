@@ -26,3 +26,16 @@ def get_analysis(sentence, language="en"):
 # # testing
 # sentence = "Bitcoin prices will fall down. USA will have big issues. System bad"
 # print(get_analysis(sentence))
+# sample output = {
+#     "sentiments": (-49.9, 0.0, -49.9),
+#     "entities": {"Bitcoin": ["BLD", 15], "United States of America": ["GEO", 7]},
+#     "knowledge": [
+#         "situation.issue",
+#         "conceptual_system",
+#         "geographic_element.country",
+#         "property.money",
+#         "event.happening",
+#         "other",
+#     ],
+#     "topics": [],
+# }
