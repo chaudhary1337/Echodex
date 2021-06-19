@@ -1,12 +1,12 @@
-from expertai.nlapi.cloud.client import ExpertAiClient
-client = ExpertAiClient()
+# from expertai.nlapi.cloud.client import ExpertAiClient
+# client = ExpertAiClient()
 
-text = "Michael Jordan was one of the best basketball players of all time. Scoring was Jordan's stand-out skill, but he still holds a defensive NBA record, with eight steals in a half." 
-# text = "bitcoin prices will fall down. USA will have big issues. System bad." 
-language= 'en'
+# text = "Michael Jordan was one of the best basketball players of all time. Scoring was Jordan's stand-out skill, but he still holds a defensive NBA record, with eight steals in a half." 
+# # text = "bitcoin prices will fall down. USA will have big issues. System bad." 
+# language= 'en'
 
-analysis = client.full_analysis(body={"document": {"text": text}}, params={'language': language})
-classification = client.classification(body={"document": {"text": text}}, params={'taxonomy': 'iptc', 'language': language})
+# analysis = client.full_analysis(body={"document": {"text": text}}, params={'language': language})
+# classification = client.classification(body={"document": {"text": text}}, params={'taxonomy': 'iptc', 'language': language})
 
 
 # example:
@@ -37,21 +37,22 @@ def get_knowledge(analysis):
     return knawledge
 
 # returns relevant topics only by default
+# ['basketball', 'sports']
 def get_topics(analysis, relevant_only=True):
     topics = [
         topic.label for topic in analysis.topics if (not relevant_only) or (relevant_only and topic.winner)
     ]
     return topics
 
-sentiments = get_sentiment(analysis)
-entities = get_entities(analysis)
-knawledge = get_knowledge(analysis)
-topics = get_topics(analysis)
+# sentiments = get_sentiment(analysis)
+# entities = get_entities(analysis)
+# knawledge = get_knowledge(analysis)
+# topics = get_topics(analysis)
 
-print(sentiments)
-print(entities)
-print(knawledge)
-print(topics)
+# print(sentiments)
+# print(entities)
+# print(knawledge)
+# print(topics)
 
 # # [['Sport', 'Competition discipline', 'Basketball']]
 # def get_categories(classification):
