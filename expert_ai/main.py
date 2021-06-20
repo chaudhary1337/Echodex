@@ -1,5 +1,5 @@
 from expertai.nlapi.cloud.client import ExpertAiClient
-from helper import get_sentiment, get_knowledge, get_entities, get_topics
+from expert_ai.helper import get_sentiment, get_knowledge, get_entities, get_topics
 
 client = ExpertAiClient()
 
