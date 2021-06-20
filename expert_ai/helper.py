@@ -39,13 +39,14 @@ def get_entities(analysis):
 
 # example:
 # ['event.outcome', 'action', 'quality.human_feature', 'person.basketball_player', 'object_group.property', 'component.object_part', 'time', 'other', 'other', 'event.happening', 'other', 'organization.sport_association', 'other']
+# UPDATE: I remove other by default since we can not make any use of it.
 def get_knowledge(analysis, relevant_only=True):
-    knawledge = [
+    knowledge = [
         word.label
         for word in analysis.knowledge
         if (not relevant_only) or (relevant_only and word.label != "other")
     ]
-    return knawledge
+    return knowledge
 
 
 # returns relevant topics only by default
