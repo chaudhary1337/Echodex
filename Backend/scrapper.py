@@ -13,7 +13,7 @@ class Scrapper:
 
     def __init__(self, query):
         self.newsapi = NewsApiClient(
-            api_key="4e8ea7f6b6224eeba684c0051f32397c")
+            api_key="")
         self.subreddits = [
             "investing",
             "personalfinance",
