@@ -28,9 +28,23 @@ client = ExpertAiClient()
 # }
 
 
-# EXAMPLE 1:
-text = "Bitcoin prices will fall down. USA will have big issues. System bad!"
-# {'sentiments': (-49.9, 0.0, -49.9), 'entities': {'Bitcoin': ['BLD', 15], 'United States of America': ['GEO', 7]}, 'knowledge': ['situation.issue', 'conceptual_system', 'geographic_element.country', 'property.money', 'event.happening', 'other'], 'topics': []}
+# # EXAMPLE 1:
+# text = "Bitcoin prices will fall down. USA will have big issues. System bad!"
+# # {'sentiments': (-49.9, 0.0, -49.9), 'entities': {'Bitcoin': ['BLD', 15], 'United States of America': ['GEO', 7]}, 'knowledge': ['situation.issue', 'conceptual_system', 'geographic_element.country', 'property.money', 'event.happening', 'other'], 'topics': []}
+
+# # EXAMPLE 2
+# text = "Born in USA, Michael Jordan was one of the best basketball players of all time. Scoring was Jordan's stand-out skill, but he still holds a defensive NBA record, with eight steals in a half."
+# # {'sentiments': (10.69, 10.69, 0.0), 'entities': {'Michael Jordan': ['NPH', 15], 'United States of America': ['GEO', 2], 'National Basketball Association': ['ORG', 10]}, 'knowledge': ['event.outcome', 'action', 'quality.human_feature', 'geographic_element.country', 'person.basketball_player', 'object_group.property', 'component.object_part', 'time', 'event.happening', 'organization.sport_association'], 'topics': ['basketball', 'sports']}
+
+# # EXAMPLE 3
+# text = "This is a text written from Italy. It is designed by nature to excite the time 9th June, 2021. Its all about the topic of cars, although I still CAN NOT figure out how topics work. I like Bugatti. That is an entity."
+# # {'sentiments': (7.0, 7.0, 0.0), 'entities': {'Jun-9-2021': ['DAT', 0], 'Italy': ['GEO', 7], 'Bugatti': ['COM', 13]}, 'knowledge': ['vehicle.car', 'state.situation', 'communication.writing', 'knowledge.form_of_thought', 'geographic_element.country', 'time.definite_time', 'knowledge.reasoning', 'feeling.good_feeling', 'creation.artistic_creation', 'behaviour.physical_behaviour', 'object.natural_object', 'state', 'organization.company'], 'topics': []}
+
+# NOTE: SUMMARY
+# sentiments: (overall, positive, negative) -> overall = positive + negative
+# entities: Bitcoin, United States of America, Michael Jordan, National Basketball Association (the numbers second in the list, for example 10 in ['ORG', 10] for NBA is the RELEVANCE SCORE. COULD BE SUED LATER). Rest is: ORGanisation/COMpany/GEOpolitical entity/DATe
+# knowledge: event.outcome, time, event.happening, organization.sport_association, conceptual_system, geographic_element.country, vehicle.car
+# topics: basketball, sports (I CANT FIGURE THIS OUT FFS)
 
 
 def get_analysis(text, language="en"):
@@ -39,13 +53,13 @@ def get_analysis(text, language="en"):
     )
     sentiments = get_sentiment(analysis)
     entities = get_entities(analysis)
-    knawledge = get_knowledge(analysis)
+    knowledge = get_knowledge(analysis)
     topics = get_topics(analysis)
 
     data = {
         "sentiments": sentiments,
         "entities": entities,
-        "knowledge": knawledge,
+        "knowledge": knowledge,
         "topics": topics,
     }
 
@@ -72,7 +86,7 @@ def get_analysis(text, language="en"):
 # text = "My girl from italy left me lmaoo. Im literally crying."
 # # {'geo': [['Italy']], 'iptc': [], 'behaviour': [], 'emotional': [['Group Dejection', 'Sadness']]}
 
-# SUMMARY
+# NOTE: SUMMARY
 # geo: countries - United States of America, India
 # behaviour: behavioral-traits - Action, Competence, Capability
 # iptc: I HAVE NO IDEA HOW IPTC WORKS
@@ -91,5 +105,6 @@ def get_classification(text, language="en"):
     return data
 
 
-print(get_analysis(text))
+# NOTE: GET THE OUTPUTS FROM HERE
+# print(get_analysis(text))
 # print(get_classification(text))
