@@ -1,17 +1,19 @@
 from newsapi import NewsApiClient
-import urllib.request, json
+import urllib.request
+import json
 import re
 import twint
 from pprint import pprint
 
 
 class Scrapper:
-    """Contains scraper function definations.
+    """Contains scraper function definitions.
     Currently available scrappers: Reddit, Twitter, News
     """
 
-    def __init__(self):
-        self.newsapi = NewsApiClient(api_key="")
+    def __init__(self, query):
+        self.newsapi = NewsApiClient(
+            api_key="4e8ea7f6b6224eeba684c0051f32397c")
         self.subreddits = [
             "investing",
             "personalfinance",
@@ -19,6 +21,7 @@ class Scrapper:
             "securityanalysis",
             "finance",
         ]
+        self.query = query
         self.reddit_days = "7"
         self.reddit_size = 30
         self.twint_config = twint.Config()
@@ -26,7 +29,7 @@ class Scrapper:
         self.twint_config.Hide_output = True
         self.twint_config.Store_object = True
 
-    def scrape_news(self, query):
+    def scrape_news(self):
         """Scraps news using NewsApi
 
         Args:
@@ -40,6 +43,7 @@ class Scrapper:
                 ...
             ]
         """
+        query = self.query
         top_headlines = self.newsapi.get_everything(q=query, language="en")
         sources = self.newsapi.get_sources()
         outputs = []
@@ -50,7 +54,7 @@ class Scrapper:
             outputs.append(output)
         return outputs
 
-    def scrape_reddit(self, query):
+    def scrape_reddit(self):
         """Scraps reddit using pushshift API
 
         Args:
@@ -69,6 +73,7 @@ class Scrapper:
                 ],
             }
         """
+        query = self.query
         query = query.replace(" ", "%20")
         comments = {}
         for subreddit in self.subreddits:
@@ -115,7 +120,7 @@ class Scrapper:
         tweet = tweet.strip()
         return tweet
 
-    def scrape_twitter(self, query):
+    def scrape_twitter(self):
         """Scraps twitter using twint
 
         Args:
@@ -134,6 +139,7 @@ class Scrapper:
                 ...
             ]
         """
+        query = self.query
         self.twint_config.Search = query
         twint.output.clean_lists()
         twint.run.Search(self.twint_config)
