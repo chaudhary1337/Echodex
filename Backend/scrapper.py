@@ -1,4 +1,4 @@
-from newsapi import NewsApiClient
+from newsapi.newsapi_client import NewsApiClient
 import urllib.request
 import json
 import re
@@ -12,8 +12,7 @@ class Scrapper:
     """
 
     def __init__(self, query):
-        self.newsapi = NewsApiClient(
-            api_key="")
+        self.newsapi = NewsApiClient(api_key="4e8ea7f6b6224eeba684c0051f32397c")
         self.subreddits = [
             "investing",
             "personalfinance",
@@ -22,8 +21,8 @@ class Scrapper:
             "finance",
         ]
         self.query = query
-        self.reddit_days = "7"
-        self.reddit_size = 30
+        # self.reddit_days = "7"
+        # self.reddit_size = 30
         self.twint_config = twint.Config()
         self.twint_config.Limit = 1
         self.twint_config.Hide_output = True
@@ -54,22 +53,37 @@ class Scrapper:
             outputs.append(output)
         return outputs
 
-    def scrape_reddit(self):
+    def scrape_reddit(
+        self,
+        max_lines=10,
+        date_in_last="7d",
+        date_till="0d",
+        subreddit_max_size=30,
+        sort_param="score",
+        sort_type="dsc",
+    ):
         """Scraps reddit using pushshift API
 
         Args:
-            query: Query to search for on news
-
+            # query:
+                # Query to search for on news
+            date_in_last:
+                5d means in the last 5 days
+            subreddit_max_size:
+                30 means max number of comments that can be returned
+            score_param:
+                "score", "num_comments", "created_utc"
+            sort_type:
+                asc/desc
         Returns:
             A dictionary:
             {
                 "subreddit1": [
-                  "comment1",
-                  "comment2",
+                  {"body": "this is some text", "score": 6},
+                  {"body": "this is some wow text", "score": 9},
                 ],
                 "subreddit2": [
-                  "comment1",
-                  "comment2",
+                  {"body": "this is some bad text", "score": 3},
                 ],
             }
         """
@@ -77,29 +91,35 @@ class Scrapper:
         query = query.replace(" ", "%20")
         comments = {}
         for subreddit in self.subreddits:
-            url = urllib.request.urlopen(
+            pre_url = (
                 f"https://api.pushshift.io/reddit/search/comment/?q={query}"
-                + f"&subreddit={subreddit}&after={self.reddit_days}"
-                + f"d&size={self.reddit_size}"
-                + f"&fields=body,score&sort_type=score&sort=desc"
+                + f"&subreddit={subreddit}&after={date_in_last}&before={date_till}"
+                + f"&size={subreddit_max_size}"
+                + f"&fields=body,score&sort_type={sort_param}&sort={sort_type}"
+                + f"&aggs=created_utc&frequency=hour"
             )
+            url = urllib.request.urlopen(pre_url)
             data = json.loads(url.read().decode())
             data_list = data["data"]
-            data_list = data_list[:5]
-            body = []
-            for x in data_list:
-                sentences = x["body"].split("\n")
-                c = 0
-                for sentence in sentences:
-                    if len(sentence) > 50 and c <= 2:
-                        body.append(sentence)
-                        c += 1
-            comments[subreddit] = body
+            # data_list = data_list[:5]
+            comments[subreddit] = [
+                item for item in data_list if len(item["body"].split("\n")) < max_lines
+            ]
+            # body = []
+            # for x in data_list:
+            #     sentences = x["body"].split("\n")
+            #     c = 0
+            #     for sentence in sentences:
+            #         if len(sentence) > 50 and c <= 2:
+            #             body.append(sentence)
+            #             c += 1
+            # comments[subreddit] = body
+            # comments[subreddit] = {sentences}
         return comments
 
     def __clean_tweet(self, tweet):
         """Cleans a specific tweet to a cleaned format.
-            Removed hashtags, mentions, multiple spaces and non-ascii 
+            Removed hashtags, mentions, multiple spaces and non-ascii
             characters.
 
         Args:
