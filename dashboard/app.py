@@ -1,11 +1,14 @@
+from matplotlib.pyplot import title
 import streamlit as st
-from expert_ai.main import get_analysis
+from expert_ai.main import get_analysis, get_classification
 from Backend.scrapper import Scrapper
 from Backend.visualizations import sentiment_piechart
 from pprint import pprint
 from datetime import date, timedelta, datetime
+from collections import Counter
 
 time_now = date(2021, 6, 21)
+global_entities = Counter()
 
 
 def changeNewsLabel(news_sort_by):
@@ -39,7 +42,7 @@ with st.sidebar:
         st.write('Advanced Configuration Options')
 
         with st.beta_expander("News"):
-            news_size = st.number_input('Limit', value=20)
+            news_size = st.number_input('Limit', value=1)
             news_sort_by = st.selectbox(
                 'Sort By', ('Relevancy', 'Popularity', 'Publisher'), index=0)
             news_sort_by = changeNewsLabel(news_sort_by)
@@ -81,10 +84,42 @@ def update_global_sentiments(value):
         sentiment_scores['neutral'] += 1
 
 
+def update_global_entities(entities):
+    entities = entities.keys()
+    global_entities.update(entities)
+
+
 def mark_entities(text, entities):
     for entity in entities:
-        text = text.replace(entity, f'**{entity}**')
+        text = text.replace(entity, f'<b>{entity}</b>')
     return text
+
+
+def clean_tags(list_obj):
+    for i, text in enumerate(list_obj):
+        words = text.split(" ")
+        new_words = []
+        for word in words:
+            word = word[0].upper() + word[1:]
+            new_words.append(word)
+        words = ' '.join(new_words)
+        list_obj[i] = words
+    text = ', '.join(list_obj)
+    text = text.replace('.', ': ')
+    text = text.replace('_', ' ')
+    return text
+
+
+def global_update(title):
+    analysis_obj = get_analysis(title)
+    update_global_sentiments(analysis_obj['sentiments'][0])
+    update_global_entities(analysis_obj['entities'])
+    title_text = mark_entities(
+        title, analysis_obj['entities'])
+    tags = analysis_obj['knowledge']
+    tags = tags[:3]
+    tags = clean_tags(tags)
+    return title_text, tags, analysis_obj['sentiments'][0]
 
 
 # fetching data
@@ -106,55 +141,66 @@ if user_input:
     with st.beta_expander("News"):
         st.title(f"News fetched for {user_input}")
         for news_obj in news_data:
-            analysis_obj = get_analysis(news_obj["title"])
-            update_global_sentiments(analysis_obj['sentiments'][0])
-            title_text = mark_entities(
-                news_obj["title"], analysis_obj['entities'])
-            st.write(f"""
-                Title: {title_text}
-
-                Score: {analysis_obj['sentiments'][0]}
-
-                Url: {news_obj["url"]}
-
-            """)
+            title_text, tags, sentiment = global_update(news_obj["title"])
+            st.markdown(f"""
+    <div>
+        <h2>
+            <a href={news_obj["url"]} style="text-decoration: none;">
+                <div style="color: {'red' if sentiment < 0 else ( 'green' if sentiment > 0 else '#ffcc00')};">
+                    {title_text}
+                </div>
+            </a>
+        </h2>
+        <i> Tags: {tags} </i>
+        <br>
+        {news_obj["description"].strip()}
+        <br>
+        <p>{news_obj["publishedAt"][:10]} | <a href={news_obj["author"]}>Author</a> </p>
+    </div>
+""", unsafe_allow_html=True)
 
     with st.beta_expander("Reddit"):
         st.title(f"Reddit data fetched for {user_input}")
         for subreddit in reddit_data:
+            st.markdown(f"""
+            <h2>{subreddit[0].upper()+subreddit[1:]}</h2>
+            """, unsafe_allow_html=True)
             for content in reddit_data[subreddit]:
-                title = content["body"]
-                analysis_obj = get_analysis(title)
-                update_global_sentiments(analysis_obj['sentiments'][0])
-                title_text = mark_entities(title, analysis_obj['entities'])
-                st.write(f"""
-                    Title: {title_text}
+                title_text, tags, sentiment = global_update(content["body"])
+                print(title_text.encode('unicode_escape'))
+                st.markdown(f"""
+    <div>
+        <h3>
+            <a href={content["permalink"]} style="text-decoration: none;">
+                <div style="color: {'red' if sentiment < 0 else ( 'green' if sentiment > 0 else '#ffcc00')};">
+                    [{content['score']}] {title_text.strip()}
+                </div>
+            </a>
+        </h3>
+        <i> Tags: {tags} </i>
+    </div>
+""", unsafe_allow_html=True)
 
-                    Score: {analysis_obj['sentiments'][0]}
-
-                    Subreddit: {subreddit}
-
-                    Url: {content['permalink']}
-
-                """)
     with st.beta_expander("Twitter"):
         st.title(f"Twitter data fetched for {user_input}")
         for twitter_obj in twitter_data:
-            analysis_obj = get_analysis(twitter_obj["tweet"])
-            update_global_sentiments(analysis_obj['sentiments'][0])
-            title_text = mark_entities(
-                twitter_obj["tweet"], analysis_obj['entities'])
-            st.write(f"""
-                Tweet: {title_text}
-
-                Username: {twitter_obj["username"]}
-
-                Likes: {twitter_obj["likes_count"]}
-
-                Score: {analysis_obj['sentiments'][0]}
-
-                Url: {twitter_obj["link"]}
-
-            """)
+            title_text, tags, sentiment = global_update(twitter_obj["tweet"])
+            st.markdown(f"""
+    <div>
+        <h2>
+            <a href={twitter_obj["link"]} style="text-decoration: none;">
+                <div style="color: {'red' if sentiment < 0 else ( 'green' if sentiment > 0 else '#ffcc00')};">
+                    {title_text.strip()}
+                </div>
+            </a>
+        </h2>
+        <i> Tags: {tags} </i>
+        <br>
+        By: {twitter_obj["username"]} | Likes: {twitter_obj["likes_count"]}
+        <br>
+        Hashtags: {', '.join(twitter_obj["hashtags"])}
+    </div>
+""", unsafe_allow_html=True)
 
     st.sidebar.pyplot(sentiment_piechart(sentiment_scores))
+    # print(global_entities)
