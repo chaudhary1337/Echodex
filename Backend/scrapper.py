@@ -29,6 +29,8 @@ class Scrapper:
         self.twint_config.Limit = 1
         self.twint_config.Hide_output = True
         self.twint_config.Store_object = True
+        self.twint_config.Since = date_from
+        self.twint_config.Until = date_to
 
     def scrape_news(self, language="en", page_size=20, sort_by="relevancy"):
         """Scraps news using NewsApi
@@ -164,11 +166,30 @@ class Scrapper:
         tweet = tweet.strip()
         return tweet
 
-    def scrape_twitter(self):
+    def scrape_twitter(
+        self,
+        limit=10,
+        filter_retweets=False,
+        popular_tweets=True,
+        verified=False,
+        min_likes=20,
+    ):
         """Scraps twitter using twint
 
         Args:
-            query: Query to search for on twitter
+            # query:
+                # Query to search for on twitter
+            limit:
+                doesnt work yet
+            filter_retweets:
+                True/False
+            popular_tweets:
+                True/False
+            verifies:
+                verified profiles only. True/False
+            min_likes:
+                20. atleast 20 likes should be there
+
 
         Returns:
             A list of dictionaries:
@@ -183,6 +204,13 @@ class Scrapper:
                 ...
             ]
         """
+        # resetting configs
+        self.twint_config.Limit = limit
+        self.twint_config.Filter_retweets = filter_retweets
+        self.twint_config.Popular_tweets = popular_tweets
+        self.twint_config.Verified = verified
+        self.twint_config.Min_likes = min_likes
+
         query = self.query
         self.twint_config.Search = query
         twint.output.clean_lists()
