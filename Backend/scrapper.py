@@ -69,8 +69,9 @@ class Scrapper:
             to=self.date_to,
             sort_by=sort_by,
         )
-
         articles = data["articles"]
+        for item in articles:
+            item['description'] = self.__clean_text(item['description'])
         return articles
 
     def scrape_reddit(
@@ -121,12 +122,13 @@ class Scrapper:
             data_list = data["data"]
             comments[subreddit] = []
             for item in data_list:
-                item["body"] = item["body"].strip()[:max_chars]
+                item["body"] = self.__clean_text(
+                    item["body"].strip()[:max_chars])
                 item["permalink"] = "https://reddit.com" + item["permalink"]
                 comments[subreddit].append(item)
         return comments
 
-    def __clean_tweet(self, tweet):
+    def __clean_text(self, tweet):
         """Cleans a specific tweet to a cleaned format.
             Removed hashtags, mentions, multiple spaces and non-ascii
             characters.
@@ -142,6 +144,7 @@ class Scrapper:
         # Remove @
         tweet = re.sub("@\w*", "", tweet)
         tweet = re.sub("&amp", "", tweet)
+        tweet = tweet.replace('\n', ' ')
         # Remove multiple spaces
         tweet = re.sub("\s{2,}", " ", tweet)
         # Remove non-ascii
@@ -208,7 +211,7 @@ class Scrapper:
             try:
                 each_entry = {}
                 each_entry["username"] = y.username
-                tweet = self.__clean_tweet(y.tweet)
+                tweet = self.__clean_text(y.tweet)
                 each_entry["tweet"] = tweet
                 each_entry["hashtags"] = y.hashtags
                 each_entry["likes_count"] = y.likes_count
