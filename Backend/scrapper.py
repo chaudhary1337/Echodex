@@ -30,22 +30,42 @@ class Scrapper:
         self.twint_config.Hide_output = True
         self.twint_config.Store_object = True
 
-    def scrape_news(self):
+    def scrape_news(self, language="en", page_size=20, sort_by="relevancy"):
         """Scraps news using NewsApi
 
         Args:
-            query: Query to search for on news
-
+            # query:
+                # Query to search for on news
+            language:
+                lmao
+            page_size:
+                number of results
+            sort_by:
+                values possible: relevancy, popularity, publishedAt
         Returns:
             A list of dictionaries:
             [
-                {"title": "title1", "url": "url1"},
-                {"title": "title2", "url": "url2"},
-                ...
+                {
+                  'author': 'https://www.engadget.com/about/editors/jon-fingas',
+                  'content': "You might have to forego dreams of driving Tesla's ..."
+                  'description': "Elon Musk claims the Tesla Model S Plaid+ is 'canceled' as "
+                  'publishedAt': '2021-06-06T21:18:04Z',
+                  'source': {'id': 'engadget', 'name': 'Engadget'},
+                  'title': "Elon Musk says Tesla Model S Plaid+ is 'canceled'",
+                  'url': 'https://www.engadget.com/elon-musk-says-tesla-model-s-plaid-plus-canceled-211804141.html',
+                  'urlToImage': 'https://s.yimg.com/os/creatr-uploaded-images/2021-03/a53fc4a0-8d72-11eb-bffa-fac9a7f8b050'
+                }
             ]
         """
         query = self.query
-        data = self.newsapi.get_everything(q=query, language="en")
+        data = self.newsapi.get_everything(
+            q=query,
+            language="en",
+            page_size=page_size,
+            from_param=self.date_from,
+            to=self.date_to,
+            sort_by=sort_by,
+        )
 
         articles = data["articles"]
 
