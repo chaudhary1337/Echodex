@@ -43,60 +43,60 @@ st.title("hello")
 # fetching data
 if user_input:
 
-    news_data = scrappy.scrape_news(page_size=1)
-    # reddit_data = scrappy.scrape_reddit()
-    # twitter_data = scrappy.scrape_twitter()
+    news_data = scrappy.scrape_news()
+    reddit_data = scrappy.scrape_reddit()
+    twitter_data = scrappy.scrape_twitter()
     print(news_data)
-    # print(reddit_data)
-    # print(twitter_data)
+    print(reddit_data)
+    print(twitter_data)
 
-    # st.title(f"News fetched for {user_input}")
-    # for news_obj in news_data:
-    #     analysis_obj = get_analysis(news_obj["title"])
-    #     update_global_sentiments(analysis_obj['sentiments'][0])
-    #     title_text = mark_entities(news_obj["title"], analysis_obj['entities'])
-    #     st.write(f"""
-    #         Title: {title_text}
+    st.title(f"News fetched for {user_input}")
+    for news_obj in news_data:
+        analysis_obj = get_analysis(news_obj["title"])
+        update_global_sentiments(analysis_obj['sentiments'][0])
+        title_text = mark_entities(news_obj["title"], analysis_obj['entities'])
+        st.write(f"""
+            Title: {title_text}
 
-    #         Score: {analysis_obj['sentiments'][0]}
+            Score: {analysis_obj['sentiments'][0]}
 
-    #         Url: {news_obj["url"]}
+            Url: {news_obj["url"]}
 
-    #     """)
+        """)
 
-    # st.title(f"Reddit data fetched for {user_input}")
-    # for subreddit in reddit_data:
-    #     for title in reddit_data[subreddit]:
-    #         analysis_obj = get_analysis(title)
-    #         update_global_sentiments(analysis_obj['sentiments'][0])
-    #         title_text = mark_entities(title, analysis_obj['entities'])
-    #         st.write(f"""
-    #             Title: {title_text}
+    st.title(f"Reddit data fetched for {user_input}")
+    for subreddit in reddit_data:
+        for content in reddit_data[subreddit]:
+            title = content["body"]
+            analysis_obj = get_analysis(title)
+            update_global_sentiments(analysis_obj['sentiments'][0])
+            title_text = mark_entities(title, analysis_obj['entities'])
+            st.write(f"""
+                Title: {title_text}
 
-    #             Score: {analysis_obj['sentiments'][0]}
+                Score: {analysis_obj['sentiments'][0]}
 
-    #             Subreddit: {subreddit}
+                Subreddit: {subreddit}
 
-    #         """)
+            """)
 
-    # st.title(f"Twitter data fetched for {user_input}")
-    # for twitter_obj in twitter_data:
-    #     analysis_obj = get_analysis(twitter_obj["tweet"])
-    #     update_global_sentiments(analysis_obj['sentiments'][0])
-    #     title_text = mark_entities(
-    #         twitter_obj["tweet"], analysis_obj['entities'])
-    #     st.write(f"""
-    #         Tweet: {title_text}
+    st.title(f"Twitter data fetched for {user_input}")
+    for twitter_obj in twitter_data:
+        analysis_obj = get_analysis(twitter_obj["tweet"])
+        update_global_sentiments(analysis_obj['sentiments'][0])
+        title_text = mark_entities(
+            twitter_obj["tweet"], analysis_obj['entities'])
+        st.write(f"""
+            Tweet: {title_text}
 
-    #         Username: {twitter_obj["username"]}
+            Username: {twitter_obj["username"]}
 
-    #         Likes: {twitter_obj["likes_count"]}
+            Likes: {twitter_obj["likes_count"]}
 
-    #         Score: {analysis_obj['sentiments'][0]}
-    #     """)
+            Score: {analysis_obj['sentiments'][0]}
+        """)
 
-    # st.pyplot(sentiment_piechart(sentiment_scores))
-    # print(sentiment_scores)
+    st.pyplot(sentiment_piechart(sentiment_scores))
 
 # sentence = "I am a good boy."
 # x = Scrapper('bitcoin')
