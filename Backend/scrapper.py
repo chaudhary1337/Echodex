@@ -12,7 +12,8 @@ class Scrapper:
     """
 
     def __init__(self, query, date_from, date_to):
-        self.newsapi = NewsApiClient(api_key="4e8ea7f6b6224eeba684c0051f32397c")
+        self.newsapi = NewsApiClient(
+            api_key="4e8ea7f6b6224eeba684c0051f32397c")
         self.subreddits = [
             "investing",
             "personalfinance",
@@ -211,6 +212,7 @@ class Scrapper:
                 each_entry["tweet"] = tweet
                 each_entry["hashtags"] = y.hashtags
                 each_entry["likes_count"] = y.likes_count
+                each_entry["link"] = f'https://twitter.com/username/status/{y.id_str}'
                 each_entry["id"] = y.id_str
                 formatted_data.append(each_entry)
             except Exception as e:
