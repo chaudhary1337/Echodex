@@ -6,6 +6,7 @@ import streamlit as st
 from expert_ai.main import get_analysis, get_classification
 from Backend.scrapper import Scrapper
 from Backend.visualizations import sentiment_piechart
+from Backend.tags import print_tags
 from pprint import pprint
 from datetime import date, timedelta, datetime
 from collections import Counter
@@ -60,7 +61,7 @@ with st.sidebar:
         with st.beta_expander("Reddit"):
             reddit_max_chars = st.number_input("Maximum Characters", value=250)
             reddit_max_content = st.number_input(
-                "Number of comments to return", value=30
+                "Number of comments to return", value=20
             )
             reddit_sort_by = st.selectbox(
                 "Sort By", ("Score", "Number of Comments", "Date"), index=0
@@ -250,7 +251,36 @@ if user_input:
             )
 
     st.sidebar.pyplot(sentiment_piechart(sentiment_scores))
-    print(global_entities)
-    print(global_geo)
-    print(global_emo)
-    print(global_beh)
+
+    best_ents = global_entities.most_common(5)
+    best_geos = global_geo.most_common(5)
+    best_emos = global_emo.most_common(5)
+    best_behs = global_beh.most_common(5)
+
+    st.markdown("<h3>Top Entities<h3>")
+    st.components.v1.html(
+        f"""
+    {print_tags(best_ents, color='#BC70A4')}
+    """,
+    )
+
+    st.markdown("<h3>Top Locations<h3>")
+    st.components.v1.html(
+        f"""
+    {print_tags(best_geos, color='#88B04B')}
+    """,
+    )
+
+    st.markdown("<h3>Top Emotional Traits<h3>")
+    st.components.v1.html(
+        f"""
+    {print_tags(best_emos, color='#F7CAC9')}
+    """,
+    )
+
+    st.markdown("<h3>Top Behavioural Traits<h3>")
+    st.components.v1.html(
+        f"""
+    {print_tags(best_behs, color='#E9897E')}
+    """
+    )
