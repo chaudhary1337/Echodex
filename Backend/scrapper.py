@@ -12,8 +12,7 @@ class Scrapper:
     """
 
     def __init__(self, query, date_from, date_to):
-        self.newsapi = NewsApiClient(
-            api_key="4e8ea7f6b6224eeba684c0051f32397c")
+        self.newsapi = NewsApiClient(api_key="4e8ea7f6b6224eeba684c0051f32397c")
         self.subreddits = [
             "investing",
             "personalfinance",
@@ -71,13 +70,13 @@ class Scrapper:
         )
         articles = data["articles"]
         for item in articles:
-            item['description'] = self.__clean_text(item['description'])
+            item["description"] = self.__clean_text(item["description"])
         return articles
 
     def scrape_reddit(
         self,
         max_chars=250,
-        subreddit_max_size=30,
+        subreddit_max_size=20,
         sort_param="score",
         sort_type="dsc",
     ):
@@ -122,8 +121,7 @@ class Scrapper:
             data_list = data["data"]
             comments[subreddit] = []
             for item in data_list:
-                item["body"] = self.__clean_text(
-                    item["body"].strip()[:max_chars])
+                item["body"] = self.__clean_text(item["body"].strip()[:max_chars])
                 item["permalink"] = "https://reddit.com" + item["permalink"]
                 comments[subreddit].append(item)
         return comments
@@ -144,7 +142,7 @@ class Scrapper:
         # Remove @
         tweet = re.sub("@\w*", "", tweet)
         tweet = re.sub("&amp", "", tweet)
-        tweet = tweet.replace('\n', ' ')
+        tweet = tweet.replace("\n", " ")
         # Remove multiple spaces
         tweet = re.sub("\s{2,}", " ", tweet)
         # Remove non-ascii
@@ -207,7 +205,7 @@ class Scrapper:
         data = twint.output.tweets_list
 
         formatted_data = []
-        for y in data:
+        for y in data[:20]:
             try:
                 each_entry = {}
                 each_entry["username"] = y.username
@@ -215,7 +213,7 @@ class Scrapper:
                 each_entry["tweet"] = tweet
                 each_entry["hashtags"] = y.hashtags
                 each_entry["likes_count"] = y.likes_count
-                each_entry["link"] = f'https://twitter.com/username/status/{y.id_str}'
+                each_entry["link"] = f"https://twitter.com/username/status/{y.id_str}"
                 each_entry["id"] = y.id_str
                 formatted_data.append(each_entry)
             except Exception as e:
