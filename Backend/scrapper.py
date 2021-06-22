@@ -62,7 +62,7 @@ class Scrapper:
         query = self.query
         data = self.newsapi.get_everything(
             q=query,
-            language="en",
+            language=language,
             page_size=page_size,
             from_param=self.date_from,
             to=self.date_to,
@@ -70,19 +70,11 @@ class Scrapper:
         )
 
         articles = data["articles"]
-
-        # sources = self.newsapi.get_sources()
-        # outputs = []
-        # for x in top_headlines["articles"]:
-        #     output = {}
-        #     output["title"] = x["title"]
-        #     output["url"] = x["url"]
-        #     outputs.append(output)
         return articles
 
     def scrape_reddit(
         self,
-        max_lines=10,
+        max_chars=250,
         subreddit_max_size=30,
         sort_param="score",
         sort_type="dsc",
@@ -92,8 +84,8 @@ class Scrapper:
         Args:
             # query:
                 # Query to search for on news
-            date_in_last:
-                5d means in the last 5 days
+            max_chars:
+                max #chars you want to show. rest is simply yeeted
             subreddit_max_size:
                 30 means max number of comments that can be returned
             score_param:
@@ -121,26 +113,16 @@ class Scrapper:
                 + f"&subreddit={subreddit}"
                 + f"&after={self.date_from}&before={self.date_to}"
                 + f"&size={subreddit_max_size}"
-                + f"&fields=body,score&sort_type={sort_param}&sort={sort_type}"
-                # + f"&aggs=created_utc&frequency=hour"
+                + f"&fields=body,score,permalink&sort_type={sort_param}&sort={sort_type}"
             )
             url = urllib.request.urlopen(pre_url)
             data = json.loads(url.read().decode())
             data_list = data["data"]
-            # data_list = data_list[:5]
-            comments[subreddit] = [
-                item for item in data_list if len(item["body"].split("\n")) < max_lines
-            ]
-            # body = []
-            # for x in data_list:
-            #     sentences = x["body"].split("\n")
-            #     c = 0
-            #     for sentence in sentences:
-            #         if len(sentence) > 50 and c <= 2:
-            #             body.append(sentence)
-            #             c += 1
-            # comments[subreddit] = body
-            # comments[subreddit] = {sentences}
+            comments[subreddit] = []
+            for item in data_list:
+                item["body"] = item["body"].strip()[:max_chars]
+                item["permalink"] = "https://reddit.com" + item["permalink"]
+                comments[subreddit].append(item)
         return comments
 
     def __clean_tweet(self, tweet):
@@ -207,7 +189,7 @@ class Scrapper:
                 ...
             ]
         """
-        # resetting configs
+        # adding more configs
         self.twint_config.Limit = limit
         self.twint_config.Filter_retweets = filter_retweets
         self.twint_config.Popular_tweets = popular_tweets
