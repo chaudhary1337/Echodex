@@ -173,6 +173,7 @@ class Scrapper:
         popular_tweets=True,
         verified=False,
         min_likes=20,
+        sort_desc=True,
     ):
         """Scraps twitter using twint
 
@@ -189,6 +190,8 @@ class Scrapper:
                 verified profiles only. True/False
             min_likes:
                 20. atleast 20 likes should be there
+            sort_desc:
+                sorts the tweets by the likes_count in descending order
 
 
         Returns:
@@ -216,6 +219,7 @@ class Scrapper:
         twint.output.clean_lists()
         twint.run.Search(self.twint_config)
         data = twint.output.tweets_list
+
         formatted_data = []
         for y in data:
             try:
@@ -230,4 +234,8 @@ class Scrapper:
             except Exception as e:
                 pprint(e)
                 continue
-        return formatted_data
+
+        sorted_data = sorted(
+            formatted_data, key=lambda tweet: tweet["likes_count"], reverse=sort_desc
+        )
+        return sorted_data

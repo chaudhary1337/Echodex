@@ -1,7 +1,7 @@
-from scrapper import Scrapper
-from pprint import pprint
+# from scrapper import Scrapper
+# from pprint import pprint
 
-scraper = Scrapper(query="tesla", date_to="2021-06-22", date_from="2021-06-01")
+# scraper = Scrapper(query="tesla", date_to="2021-06-22", date_from="2021-06-01")
 
 # # REDDIT: WORKS!
 # d = scraper.scrape_reddit(
@@ -17,8 +17,12 @@ scraper = Scrapper(query="tesla", date_to="2021-06-22", date_from="2021-06-01")
 # pprint(len(results))
 # pprint(results)
 
-results = scraper.scrape_twitter(
-    limit=10, filter_retweets=False, popular_tweets=True, verified=False, min_likes=50
-)
-pprint(results)
-pprint(len(results))
+# TWITTER: WORKS!
+# results = scraper.scrape_twitter(
+#     limit=10, filter_retweets=False, popular_tweets=True, verified=False, min_likes=50
+# )
+# pprint(results)
+# pprint(len(results))
+
+
+# DONE. YEEEEEEEEEEEEEE
