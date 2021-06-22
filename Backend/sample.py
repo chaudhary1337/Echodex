@@ -1,7 +1,7 @@
 from scrapper import Scrapper
 from pprint import pprint
 
-scraper = Scrapper(query="tesla", date_to="2021-06-22", date_from="2021-06-18")
+scraper = Scrapper(query="tesla", date_to="2021-06-22", date_from="2021-06-01")
 
 # # REDDIT: WORKS!
 # d = scraper.scrape_reddit(
@@ -12,6 +12,7 @@ scraper = Scrapper(query="tesla", date_to="2021-06-22", date_from="2021-06-18")
 # )
 # pprint(d)
 
-# results = scraper.scrape_news()
+# NEWS: WORKS!
+# results = scraper.scrape_news(language="en", page_size=1, sort_by="relevancy")
 # pprint(len(results))
-# # pprint(results)
+# pprint(results)
