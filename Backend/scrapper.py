@@ -11,7 +11,7 @@ class Scrapper:
     Currently available scrappers: Reddit, Twitter, News
     """
 
-    def __init__(self, query):
+    def __init__(self, query, date_from, date_to):
         self.newsapi = NewsApiClient(api_key="4e8ea7f6b6224eeba684c0051f32397c")
         self.subreddits = [
             "investing",
@@ -21,6 +21,8 @@ class Scrapper:
             "finance",
         ]
         self.query = query
+        self.date_from = date_from
+        self.date_to = date_to
         # self.reddit_days = "7"
         # self.reddit_size = 30
         self.twint_config = twint.Config()
@@ -43,21 +45,22 @@ class Scrapper:
             ]
         """
         query = self.query
-        top_headlines = self.newsapi.get_everything(q=query, language="en")
-        sources = self.newsapi.get_sources()
-        outputs = []
-        for x in top_headlines["articles"]:
-            output = {}
-            output["title"] = x["title"]
-            output["url"] = x["url"]
-            outputs.append(output)
-        return outputs
+        data = self.newsapi.get_everything(q=query, language="en")
+
+        articles = data["articles"]
+
+        # sources = self.newsapi.get_sources()
+        # outputs = []
+        # for x in top_headlines["articles"]:
+        #     output = {}
+        #     output["title"] = x["title"]
+        #     output["url"] = x["url"]
+        #     outputs.append(output)
+        return articles
 
     def scrape_reddit(
         self,
         max_lines=10,
-        date_in_last="7d",
-        date_till="0d",
         subreddit_max_size=30,
         sort_param="score",
         sort_type="dsc",
@@ -93,10 +96,11 @@ class Scrapper:
         for subreddit in self.subreddits:
             pre_url = (
                 f"https://api.pushshift.io/reddit/search/comment/?q={query}"
-                + f"&subreddit={subreddit}&after={date_in_last}&before={date_till}"
+                + f"&subreddit={subreddit}"
+                + f"&after={self.date_from}&before={self.date_to}"
                 + f"&size={subreddit_max_size}"
                 + f"&fields=body,score&sort_type={sort_param}&sort={sort_type}"
-                + f"&aggs=created_utc&frequency=hour"
+                # + f"&aggs=created_utc&frequency=hour"
             )
             url = urllib.request.urlopen(pre_url)
             data = json.loads(url.read().decode())
